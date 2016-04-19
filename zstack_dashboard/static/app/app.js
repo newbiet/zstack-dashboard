@@ -6976,7 +6976,7 @@ var Utils;
     }
     Utils.stringContains = stringContains;
     function isIpv4Address(ip) {
-        var pattern = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/;
+        var pattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         return pattern.test(ip);
     }
     Utils.isIpv4Address = isIpv4Address;
@@ -7537,6 +7537,7 @@ angular.module("root", ['app.service', 'kendo.directives', 'ngRoute', 'ngTagsInp
         suffix: '.json' // suffix, currently- extension of the translations  
     });
     $translateProvider.preferredLanguage('en_US'); // is applied on first load  
+    $translateProvider.useCookieStorage();
 });
 /// <reference path="d.ts/angularjs/angular.d.ts" />
 /// <reference path="d.ts/kendo.all.d.ts" />
@@ -16681,7 +16682,10 @@ var MImage;
             this.tagService = tagService;
             $scope.model = new ImageModel();
             $scope.model.current = current;
-            $scope.funcDelete = function (win) {
+            $scope.funcDeleteImage = function (win) {
+                win.open();
+            };
+            $scope.funcExpungeImage = function (win) {
                 win.open();
             };
             $scope.action = new Action($scope, imageMgr);
@@ -16941,11 +16945,11 @@ var MImage;
             $scope.funcCreateImage = function (win) {
                 win.open();
             };
-            $scope.funcDeleteImage = function () {
-                $scope.deleteImage.open();
+            $scope.funcDeleteImage = function (win) {
+                win.open();
             };
-            $scope.funcExpungeImage = function (e) {
-                e.open();
+            $scope.funcExpungeImage = function (win) {
+                win.open();
             };
             $scope.optionsDeleteImage = {
                 title: 'DELETE IMAGE',
@@ -19407,7 +19411,7 @@ var MVmInstance;
             $scope.console = function () {
                 vmMgr.getConsole(current, function (inv) {
                     var windowName = current.name + current.uuid;
-                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}', inv.hostname, inv.port, inv.token), windowName);
+                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}&title={3}', inv.hostname, inv.port, inv.token, current.name), windowName);
                 });
             };
             $scope.optionsTag = {
@@ -19732,7 +19736,7 @@ var MVmInstance;
             $scope.console = function () {
                 vmMgr.getConsole($scope.model.current, function (inv) {
                     var windowName = $scope.model.current.name + $scope.model.current.uuid;
-                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}', inv.hostname, inv.port, inv.token), windowName);
+                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}&title={3}', inv.hostname, inv.port, inv.token, $scope.model.current.name), windowName);
                 });
             };
             $scope.optionsMigrateVm = {
@@ -19823,9 +19827,6 @@ var MVmInstance;
                 q.addCondition({ name: 'uuid', op: '!=', value: _this.options.vm.instanceOfferingUuid });
                 _this.insMgr.query(q, function (ins) {
                     _this.$scope.instanceOfferingOptions__.dataSource.data(ins);
-                    if (ins.length > 0) {
-                        _this.$scope.instanceOfferingUuid = ins[0].uuid;
-                    }
                     chain.next();
                 });
             }).done(function () {
@@ -24696,7 +24697,7 @@ var MSecurityGroup;
                     dataTextField: "name",
                     dataValueField: "uuid",
                     itemTemplate: '<div style="color: black"><span class="z-label">Name:</span><span>#: name #</span></div>' +
-                        '<div style="color: black"><span class="z-label">Type:</span><span>#: type #</span></div>' +
+                        '<div style="color: black"><span class="z-label">TYPE:</span><span>#: type #</span></div>' +
                         '<div style="color: black"><span class="z-label">Zone UUID:</span><span>#: zoneUuid #</span></div>' +
                         '<div style="color: black"><span class="z-label">L2 Network UUID:</span><span>#: l2NetworkUuid #</span></div>' +
                         '<div style="color: black"><span class="z-label">UUID:</span><span>#: uuid #</span></div>',
@@ -28768,7 +28769,7 @@ var MVirtualRouter;
                 var current = $scope.model.current;
                 vmMgr.getConsole(current, function (inv) {
                     var windowName = current.name + current.uuid;
-                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}', inv.hostname, inv.port, inv.token), windowName);
+                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}&title={3}', inv.hostname, inv.port, inv.token, current.name), windowName);
                 });
             };
             $scope.funcDelete = function (win) {
@@ -29076,7 +29077,7 @@ var MVirtualRouter;
                 var current = $scope.model.current;
                 vmMgr.getConsole(current, function (inv) {
                     var windowName = current.name + current.uuid;
-                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}', inv.hostname, inv.port, inv.token), windowName);
+                    $window.open(Utils.sprintf('/static/templates/console/vnc_auto.html?host={0}&port={1}&token={2}&title={3}', inv.hostname, inv.port, inv.token, current.name), windowName);
                 });
             };
         }
@@ -30984,6 +30985,9 @@ var Directive;
                     var tmp = {};
                     angular.forEach(_this.conditions, function (cond) {
                         if (cond.op != 'in' && cond.op != 'not in') {
+                            if (cond.op == 'like' || cond.op == 'not like') {
+                                cond.value = '%' + cond.value + '%';
+                            }
                             ret.push(cond);
                         }
                         else {
